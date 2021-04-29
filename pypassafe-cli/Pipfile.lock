@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8382cec6e59055431734769396ae672ce1a8ddeee68a1190468e25196577fc1e"
+            "sha256": "969b51db12c40ac9357ca09d20330a8e7feb2bf2b0f0f74fbeaf0e65abe470a8"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,8 +16,8 @@
         ]
     },
     "default": {
-        "pypassafe-lib": {
-            "path": "./../pypassafe-lib",
+        "pypassafe": {
+            "path": "./..",
             "version": "==0.0.1"
         }
     },
