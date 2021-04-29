@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "8382cec6e59055431734769396ae672ce1a8ddeee68a1190468e25196577fc1e"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.9"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "pypassafe-lib": {
+            "path": "./../pypassafe-lib",
+            "version": "==0.0.1"
+        }
+    },
+    "develop": {}
+}
