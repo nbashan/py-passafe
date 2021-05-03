@@ -1,7 +1,7 @@
 import sys
 sys.path.append('pypassafe')
 
-import pypassafe.database.database
+from pypassafe.database import EncryptedDB, MyDataBase
 import unittest
 
 class TestMyDatabaseMethods(unittest.TestCase):
