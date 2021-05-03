@@ -1,5 +1,5 @@
 from .database import DataBase
-from typing import Optional, Callable, Any, Union
+from typing import Optional, Callable, Any, List
 import json
 
 from Crypto.Random import get_random_bytes
@@ -58,7 +58,7 @@ class MyDataBase(DataBase):
         with open(self.path, 'wb') as file:
             file.write(self.data)
 
-    def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> list[Any]:
+    def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> List[Any]:
         return list(filter(predicate, self.data))
 
     def add(self, obj: Any) -> None:

@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Any, Type
+from typing import Optional, Callable, Any, Type, List
 
 
 class DataBase:
@@ -14,7 +14,7 @@ class DataBase:
     def save(self, path: Optional[str] = None) -> None:
         raise NotImplementedError()
 
-    def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> list[Any]:
+    def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> List[Any]:
         raise NotImplementedError()
 
     def add(self, obj: Any) -> None:
@@ -34,6 +34,18 @@ class DecryptedDB:
     def encrypt(self, master: Optional[str] = None) -> 'EncryptedDB':
         self.db.encrypt(master)
         return EncryptedDB(db=self.db)
+
+    def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> List[Any]:
+        return self.db.get(predicate, count)
+
+    def add(self, obj: Any) -> None:
+        self.db.add(obj)
+
+    def update(self, predicate: Callable[[Any], Optional[Any]], count: Optional[int] = None) -> None:
+        return self.db.update(predicate, count)
+
+    def remove(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> None:
+        self.db.remove(predicate, count)
 
 
 class EncryptedDB:
