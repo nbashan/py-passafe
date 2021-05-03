@@ -12,18 +12,22 @@ class MyDataBase(DataBase):
 
     def __init__(self, path: str) -> None:
         super(MyDataBase, self).__init__(path)
-        self.master = ""
-        with open(self.path, 'rb') as file:
-            self.data: Union[list[Any], bytes] = file.read()
+        try:
+            with open(self.path, 'rb') as file:
+                self.data = file.read()
+        except FileNotFoundError:
+            self.data = list()
 
     def decrypt(self, master: str) -> None:
         if self.__is_decrypted():
             return
 
+        self.master = master
+
         iv = self.data[:AES.block_size]
         salt = self.data[AES.block_size:MyDataBase.SALT_SIZE]
         encrypted = self.data[AES.block_size + MyDataBase.SALT_SIZE:]
-        key = self.__generate_key(master, salt)
+        key = self.__generate_key(self.master, salt)
 
         cipher = AES.new(key, AES.MODE_CBC, iv)
         decrypted = cipher.decrypt(encrypted).decode()
