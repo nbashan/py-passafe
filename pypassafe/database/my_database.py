@@ -1,11 +1,12 @@
 from .database import DataBase
 from typing import Optional, Callable, Any, List
-import json
+import pickle
 
 from Crypto.Random import get_random_bytes
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 
 
 class MyDataBase(DataBase):
@@ -25,15 +26,16 @@ class MyDataBase(DataBase):
 
         self.master = master
 
-        iv = self.data[:AES.block_size]
-        salt = self.data[AES.block_size:MyDataBase.SALT_SIZE]
-        encrypted = self.data[AES.block_size + MyDataBase.SALT_SIZE:]
+        salt = self.data[AES.block_size:AES.block_size + MyDataBase.SALT_SIZE]
         key = self.__generate_key(self.master, salt)
 
+        iv = self.data[:AES.block_size]
         cipher = AES.new(key, AES.MODE_CBC, iv)
-        decrypted = cipher.decrypt(encrypted).decode()
 
-        self.__set_data_from_json(self.__unpad(decrypted))
+        encrypted = self.data[AES.block_size + MyDataBase.SALT_SIZE:]
+        decrypted = unpad(cipher.decrypt(encrypted), AES.block_size)
+
+        self.data = pickle.loads(decrypted)
 
     def encrypt(self, master: Optional[str] = None) -> None:
         if not self.__is_decrypted():
@@ -44,11 +46,11 @@ class MyDataBase(DataBase):
         salt = get_random_bytes(MyDataBase.SALT_SIZE)
         key = self.__generate_key(master, salt)
 
-        json_padded = self.__pad(self.__data_to_json())
-
         iv = get_random_bytes(AES.block_size)
         cipher = AES.new(key, AES.MODE_CBC, iv)
-        self.data = iv + salt + cipher.encrypt(json_padded.encode())
+
+        data_padded = pad(pickle.dumps(self.data), AES.block_size)
+        self.data = iv + salt + cipher.encrypt(data_padded)
 
     def save(self, path: Optional[str] = None) -> None:
         if self.__is_decrypted():
@@ -79,38 +81,6 @@ class MyDataBase(DataBase):
 
     def __is_decrypted(self) -> bool:
         return isinstance(self.data, list)
-
-    def __data_to_json(self) -> str:
-        json_list = map(lambda obj: self.__encode_to_json(obj), self.data)
-        json_data = ",\n".join(json_list)
-        return json_data
-
-    def __set_data_from_json(self, json_data: str) -> None:
-        data = json_data.split(",\n")
-        self.data = list(map(lambda obj: self.__decode_from_json(obj), data))
-
-    @staticmethod
-    def __encode_to_json(obj: Any) -> str:
-        result = obj.__dict__
-        result["@@type@@"] = obj.__name__
-        return json.dumps(result)
-
-    @staticmethod
-    def __decode_from_json(encoded: str) -> Any:
-        result = json.loads(encoded)
-        type_name = result["@@type@@"]
-        del result["@@type@@"]
-
-        type = globals()[type_name]
-        return type(dict=result)
-
-    @staticmethod
-    def __pad(data: str) -> str:
-        return data + (AES.block_size - len(data) % AES.block_size) * chr(AES.block_size - len(data) % AES.block_size)
-
-    @staticmethod
-    def __unpad(padded: str) -> str:
-        return padded[:-ord(padded[len(padded) - 1:])]
 
     @staticmethod
     def __generate_key(password: str, salt: bytes) -> bytes:
