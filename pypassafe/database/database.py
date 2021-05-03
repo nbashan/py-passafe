@@ -1,8 +1,9 @@
 from typing import Optional, Callable, Any, Type
 
+
 class DataBase:
     def __init__(self, path: str) -> None:
-        pass
+        self.path = path
 
     def decrypt(self, master: str) -> None:
         raise NotImplementedError()
@@ -25,6 +26,7 @@ class DataBase:
     def remove(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> None:
         raise NotImplementedError()
 
+
 class DecryptedDB:
     def __init__(self, db: DataBase) -> None:
         self.db = db
@@ -33,8 +35,10 @@ class DecryptedDB:
         self.db.encrypt(master)
         return EncryptedDB(db=self.db)
 
+
 class EncryptedDB:
-    def __init__(self, db_type: Optional[Type[DataBase]] = None, path: Optional[str] = None, db: Optional[DataBase] = None) -> None:
+    def __init__(self, db_type: Optional[Type[DataBase]] = None, path: Optional[str] = None,
+                 db: Optional[DataBase] = None) -> None:
         if db is not None:
             self.db = db
             return
