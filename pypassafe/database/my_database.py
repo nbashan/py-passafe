@@ -7,6 +7,7 @@ from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 
+
 class MyDataBase(DataBase):
     SALT_SIZE = 32
 
@@ -50,7 +51,7 @@ class MyDataBase(DataBase):
             self.encrypt()
         if path is not None:
             self.path = path
-        with open(self.path,'wb') as file:
+        with open(self.path, 'wb') as file:
             file.write(self.data)
 
     def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> list[Any]:
@@ -105,9 +106,8 @@ class MyDataBase(DataBase):
 
     @staticmethod
     def __unpad(padded: str) -> str:
-        return padded[:-ord(padded[len(padded)-1:])]
+        return padded[:-ord(padded[len(padded) - 1:])]
 
     @staticmethod
     def __generate_key(password: str, salt: bytes) -> bytes:
         return PBKDF2(password, salt, 32, 1000000, hmac_hash_module=SHA256)
-
