@@ -41,7 +41,7 @@ class EncryptedDB:
         if path is not None:
             self.db = DataBase(path)
             return
-        raise ValueError("EncryptedDB should get path or existing DataBas")
+        raise ValueError("EncryptedDB should get path or existing DataBase")
 
     def decrypt(self, master: str) -> DecryptedDB:
         self.db.decrypt(master)
@@ -49,3 +49,4 @@ class EncryptedDB:
 
     def save(self, path: Optional[str] = None) -> None:
         self.db.save(path)
+
