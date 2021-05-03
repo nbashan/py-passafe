@@ -1,5 +1,6 @@
 import sys
 sys.path.append('pypassafe')
+
 import pypassafe.database.database
 import unittest
 
