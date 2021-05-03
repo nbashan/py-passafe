@@ -1,17 +1,29 @@
-from typing import Optional
+from typing import Optional, Callable, Any
 
 class DataBase:
     def __init__(self, path: str) -> None:
         pass
 
     def decrypt(self, master: str) -> None:
-        self.master = master
+        raise NotImplementedError()
 
     def encrypt(self, master: Optional[str] = None) -> None:
-        pass
+        raise NotImplementedError()
 
     def save(self, path: Optional[str] = None) -> None:
-        pass
+        raise NotImplementedError()
+
+    def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> list[Any]:
+        raise NotImplementedError()
+
+    def add(self, obj: Any) -> None:
+        raise NotImplementedError()
+
+    def update(self, predicate: Callable[[Any], Optional[Any]], count: Optional[int] = None) -> None:
+        raise NotImplementedError()
+
+    def remove(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> None:
+        raise NotImplementedError()
 
 class DecryptedDB:
     def __init__(self, db: DataBase) -> None:
@@ -29,7 +41,7 @@ class EncryptedDB:
         if path is not None:
             self.db = DataBase(path)
             return
-        raise ValueError("EncryptedDB should get path or existing DataBas")
+        raise ValueError("EncryptedDB should get path or existing DataBase")
 
     def decrypt(self, master: str) -> DecryptedDB:
         self.db.decrypt(master)
