@@ -54,16 +54,23 @@ class MyDataBase(DataBase):
             file.write(self.data)
 
     def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> list[Any]:
-        raise NotImplementedError()
+        return list(filter(predicate, self.data))
 
     def add(self, obj: Any) -> None:
-        raise NotImplementedError()
+        self.data.append(obj)
 
     def update(self, predicate: Callable[[Any], Optional[Any]], count: Optional[int] = None) -> None:
-        raise NotImplementedError()
+        ret = []
+        for obj in self.data:
+            x = predicate(obj)
+            if x is None:
+                ret.append(obj)
+            else:
+                ret.append(x)
+        self.data = ret
 
     def remove(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> None:
-        raise NotImplementedError()
+        self.data = [obj for obj in self.data if not predicate(obj)]
 
     def __is_decrypted(self) -> bool:
         return isinstance(self.data, list)
@@ -75,7 +82,7 @@ class MyDataBase(DataBase):
 
     def __set_data_from_json(self, json_data: str) -> None:
         data = json_data.split(",\n")
-        self.data = map(lambda obj: self.__decode_from_json(obj), data)
+        self.data = list(map(lambda obj: self.__decode_from_json(obj), data))
 
     @staticmethod
     def __encode_to_json(obj: Any) -> str:
@@ -103,3 +110,4 @@ class MyDataBase(DataBase):
     @staticmethod
     def __generate_key(password: str, salt: bytes) -> bytes:
         return PBKDF2(password, salt, 32, 1000000, hmac_hash_module=SHA256)
+
