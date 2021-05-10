@@ -10,7 +10,8 @@ from Crypto.Util.Padding import pad, unpad
 
 
 class MyDataBase(DataBase):
-    SALT_SIZE = 32
+    SALT_BYTES = 2
+    LOOPS_BYTES = 4
 
     def __init__(self, path: str) -> None:
         super(MyDataBase, self).__init__(path)
@@ -21,50 +22,63 @@ class MyDataBase(DataBase):
             self.data = list()
 
     def decrypt(self, master: str) -> None:
-        if self.__is_decrypted():
-            return
+        assert isinstance(self.data, bytes), "tries to decrypt when already decrypted"
 
         self.master = master
+        offset = 0
 
-        salt = self.data[AES.block_size:AES.block_size + MyDataBase.SALT_SIZE]
-        key = self.__generate_key(self.master, salt) # type: ignore
+        salt_size = int.from_bytes(self.data[offset:offset + self.SALT_BYTES], \
+                byteorder='little', signed=False)
+        offset += self.SALT_BYTES
 
-        iv = self.data[:AES.block_size]
-        cipher = AES.new(key, AES.MODE_CBC, iv) # type: ignore
+        loops = int.from_bytes(self.data[offset:offset + self.LOOPS_BYTES], \
+                byteorder='little', signed=False)
+        offset += self.LOOPS_BYTES
 
-        encrypted = self.data[AES.block_size + MyDataBase.SALT_SIZE:]
-        decrypted = unpad(cipher.decrypt(encrypted), AES.block_size) # type: ignore
+        salt = self.data[offset:offset + salt_size]
+        offset += salt_size
+        key = PBKDF2(master, salt, 32, loops, hmac_hash_module=SHA256)
+
+        iv = self.data[offset:offset + AES.block_size]
+        offset += AES.block_size
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+
+        encrypted = self.data[offset:]
+        decrypted = unpad(cipher.decrypt(encrypted), AES.block_size)
 
         self.data = pickle.loads(decrypted)
 
-    def encrypt(self, master: Optional[str] = None) -> None:
-        if not self.__is_decrypted():
-            return
+    def encrypt(self, master: Optional[str] = None, loops: int = 1000000, salt_size: int = 32) -> None:
+        assert isinstance(self.data, list), "tries to encrypt when already encrypted"
 
         if master is None:
             master = self.master
-        salt = get_random_bytes(MyDataBase.SALT_SIZE)
-        key = self.__generate_key(master, salt)
+
+        salt_size_bytes = salt_size.to_bytes(length=self.SALT_BYTES, byteorder='little', signed=False)
+        loops_bytes = loops.to_bytes(length=self.LOOPS_BYTES, byteorder='little', signed=False)
+
+        salt = get_random_bytes(salt_size)
+        key = PBKDF2(master, salt, 32, loops, hmac_hash_module=SHA256)
 
         iv = get_random_bytes(AES.block_size)
         cipher = AES.new(key, AES.MODE_CBC, iv)
 
         data_padded = pad(pickle.dumps(self.data), AES.block_size)
-        self.data = iv + salt + cipher.encrypt(data_padded)
+        self.data = salt_size_bytes + loops_bytes + salt + iv + cipher.encrypt(data_padded)
 
     def save(self, path: Optional[str] = None) -> None:
-        if self.__is_decrypted():
-            self.encrypt()
+        assert isinstance(self.data, bytes), "tries to save decrypted data"
+
         if path is not None:
             self.path = path
         with open(self.path, 'wb') as file:
-            file.write(self.data) # type: ignore
+            file.write(self.data)
 
     def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> List[Any]:
         return list(filter(predicate, self.data))
 
     def add(self, obj: Any) -> None:
-        self.data.append(obj) # type: ignore
+        self.data.append(obj)
 
     def update(self, predicate: Callable[[Any], Optional[Any]], count: Optional[int] = None) -> None:
         ret = []
@@ -79,9 +93,3 @@ class MyDataBase(DataBase):
     def remove(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> None:
         self.data = [obj for obj in self.data if not predicate(obj)]
 
-    def __is_decrypted(self) -> bool:
-        return isinstance(self.data, list)
-
-    @staticmethod
-    def __generate_key(password: str, salt: bytes) -> bytes:
-        return PBKDF2(password, salt, 32, 1000000, hmac_hash_module=SHA256)
