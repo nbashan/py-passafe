@@ -27,13 +27,13 @@ class MyDataBase(DataBase):
         self.master = master
 
         salt = self.data[AES.block_size:AES.block_size + MyDataBase.SALT_SIZE]
-        key = self.__generate_key(self.master, salt)
+        key = self.__generate_key(self.master, salt) # type: ignore
 
         iv = self.data[:AES.block_size]
-        cipher = AES.new(key, AES.MODE_CBC, iv)
+        cipher = AES.new(key, AES.MODE_CBC, iv) # type: ignore
 
         encrypted = self.data[AES.block_size + MyDataBase.SALT_SIZE:]
-        decrypted = unpad(cipher.decrypt(encrypted), AES.block_size)
+        decrypted = unpad(cipher.decrypt(encrypted), AES.block_size) # type: ignore
 
         self.data = pickle.loads(decrypted)
 
@@ -58,13 +58,13 @@ class MyDataBase(DataBase):
         if path is not None:
             self.path = path
         with open(self.path, 'wb') as file:
-            file.write(self.data)
+            file.write(self.data) # type: ignore
 
     def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> List[Any]:
         return list(filter(predicate, self.data))
 
     def add(self, obj: Any) -> None:
-        self.data.append(obj)
+        self.data.append(obj) # type: ignore
 
     def update(self, predicate: Callable[[Any], Optional[Any]], count: Optional[int] = None) -> None:
         ret = []

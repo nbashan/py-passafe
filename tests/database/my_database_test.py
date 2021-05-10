@@ -3,8 +3,12 @@ sys.path.append('pypassafe')
 
 from pypassafe.database import EncryptedDB, MyDataBase
 import unittest
+from unittest.mock import mock_open
 
 class TestMyDatabaseMethods(unittest.TestCase):
+    def setUp(self):
+        self.mock_open_not_found = mock_open()
+        self.mock_open_not_found.side_effect = FileNotFoundError
 
     def test_ctor(self):
         pass
