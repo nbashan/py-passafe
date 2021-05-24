@@ -16,7 +16,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent"
     ],
-    packages=setuptools.find_packages(include=["pypassafe"]),
+    packages=["pypassafe"],
     python_requires=">=3.8",
     install_requires=[],
 )
