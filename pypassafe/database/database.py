@@ -45,11 +45,7 @@ class DecryptedDB:
 
 
 class EncryptedDB:
-    def __init__(self, db_type: Optional[Type[DataBase]] = None, path: Optional[str] = None,
-                 db: Optional[DataBase] = None) -> None:
-        if db is not None:
-            self.db = db
-            return
+    def __init__(self, db_type: Optional[Type[DataBase]] = None, path: Optional[str] = None) -> None:
         if path is not None and type is not None:
             self.db = db_type(path)
             return
