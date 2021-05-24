@@ -6,6 +6,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 setuptools.setup(
     name="pypassafe",
     version="0.0.1",
+    license="MIT",
     description="py-passafe - library for password management",
     long_description=long_description,
     long_description_content_type="text/markdown",
