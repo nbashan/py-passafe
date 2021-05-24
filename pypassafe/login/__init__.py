@@ -1,3 +1,1 @@
-from .manager import last
-
-Login = last()
+from .manager import Login

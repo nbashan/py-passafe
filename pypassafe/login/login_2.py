@@ -1,6 +1,4 @@
-from typing import Type
-
-from pypassafe.login import manager
+from pypassafe.login.manager import Login
 from pypassafe.migrations import MigrateableObject
 from .login_1 import Login1
 
@@ -12,15 +10,11 @@ class Login2(MigrateableObject):
         self.url = url
 
     @staticmethod
-    def migrate(migrateable: "MigrateableObject") -> "MigrateableObject":
+    def migrate(migrateable: MigrateableObject) -> "Login2":
         if isinstance(migrateable, Login2):
             return migrateable
-        if not isinstance(migrateable, Login1):
-            login1 = Login1.migrate(migrateable)
-        else:
-            login1 = migrateable
+        login1 = Login1.migrate(migrateable)
         return Login2(login1.name, login1.password, url="empty")
 
-    @staticmethod
-    def last() -> Type[MigrateableObject]:
-        return manager.last()
+    def update_to_last(self) -> MigrateableObject:
+        return Login.migrate(self)

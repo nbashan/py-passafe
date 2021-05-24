@@ -1,4 +1,4 @@
-from pypassafe.login import manager
+from pypassafe.login.manager import Login
 from pypassafe.migrations import MigrateableObject
 
 
@@ -8,9 +8,9 @@ class Login1(MigrateableObject):
         self.password = password
 
     @staticmethod
-    def migrate(migrateable: "MigrateableObject") -> "MigrateableObject":
+    def migrate(migrateable: MigrateableObject) -> "Login1":
+        assert isinstance(migrateable, Login1)
         return migrateable
 
-    @staticmethod
-    def last() -> "MigrateableObject":
-        return manager.last()
+    def update_to_last(self) -> MigrateableObject:
+        return Login.migrate(self)
