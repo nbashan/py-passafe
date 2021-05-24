@@ -19,9 +19,14 @@ class MyDataBase(DataBase):
             with open(self.path, 'rb') as file:
                 self.data = file.read()
         except FileNotFoundError:
-            self.data = list()
+            self.data = None
 
     def decrypt(self, master: str) -> None:
+        # when creating a new database, data is equal to None
+        if self.data is None:
+            self.data = list()
+            return
+
         assert isinstance(self.data, bytes), "tries to decrypt when already decrypted"
 
         self.master = master
