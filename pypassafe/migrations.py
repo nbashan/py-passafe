@@ -1,11 +1,13 @@
+from typing import Type
+
 
 class MigrateableObject:
     @staticmethod
-    def migrate(self, migrateable: "MigrateableObject") -> "MigrateableObject":
+    def migrate(migrateable: "MigrateableObject") -> "MigrateableObject":
         raise NotImplementedError()
 
     @staticmethod
-    def last(self) -> "MigrateableObject":
+    def last() -> Type["MigrateableObject"]:
         raise NotImplementedError()
 
     def update_to_last(self) -> "MigrateableObject":
