@@ -11,7 +11,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/nbashan/py-passafe.git",
-    classifieres=[
+    classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent"
@@ -21,4 +21,7 @@ setuptools.setup(
     install_requires=[
         "pycryptodome",
     ],
+    test_suite="nose.collector",
+    tests_require=["nose"],
+    include_package_data=True,
 )
