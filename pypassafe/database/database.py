@@ -55,7 +55,7 @@ class EncryptedDB:
             return
         raise ValueError("EncryptedDB should get path and db type or existing DataBase")
 
-    def decrypt(self, master: str, predicate: Callable[[DecryptedDB], None]) -> DecryptedDB:
+    def decrypt(self, master: str, predicate: Callable[[DecryptedDB], None]) -> None:
         self.db.decrypt(master)
         predicate(DecryptedDB(self.db))
         self.db.encrypt(master)
