@@ -1,4 +1,4 @@
-from pypassafe.login.manager import Login
+from pypassafe.login import manager
 from pypassafe.migrations import MigrateableObject
 from .login_1 import Login1
 
@@ -17,4 +17,4 @@ class Login2(MigrateableObject):
         return Login2(login1.name, login1.password, url="empty")
 
     def update_to_last(self) -> MigrateableObject:
-        return Login.migrate(self)
+        return manager.Login.migrate(self)
