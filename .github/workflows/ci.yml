@@ -4,6 +4,9 @@ on: push
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -11,7 +14,7 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: ${{ python-version }}
 
       - name: Install dependencies
         run: |
