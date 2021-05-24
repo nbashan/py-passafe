@@ -5,9 +5,9 @@ name = "pypi"
 
 [packages]
 pycryptodome = "*"
-nose = "*"
 
 [dev-packages]
+nose = "*"
 
 [requires]
 python_version = "3.8"
