@@ -14,7 +14,7 @@ class Login2(MigrateableObject):
         if isinstance(migrateable, Login2):
             return migrateable
         login1 = Login1.migrate(migrateable)
-        return Login2(login1.name, login1.password, url="empty")
+        return Login2(login1.name, login1.password, url="")
 
     def update_to_last(self) -> MigrateableObject:
         return manager.Login.migrate(self)
