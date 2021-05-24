@@ -47,7 +47,6 @@ class TestMyDatabaseMethods(unittest.TestCase):
     def test_decode_from_json(self):
         pass
 
-
     def test_pad(self):
         pass
 

@@ -31,10 +31,6 @@ class DecryptedDB:
     def __init__(self, db: DataBase) -> None:
         self.db = db
 
-    def encrypt(self, master: Optional[str] = None) -> 'EncryptedDB':
-        self.db.encrypt(master)
-        return EncryptedDB(db=self.db)
-
     def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> List[Any]:
         return self.db.get(predicate, count)
 
@@ -59,9 +55,10 @@ class EncryptedDB:
             return
         raise ValueError("EncryptedDB should get path and db type or existing DataBase")
 
-    def decrypt(self, master: str) -> DecryptedDB:
+    def decrypt(self, master: str, predicate: Callable[[DecryptedDB], None]) -> DecryptedDB:
         self.db.decrypt(master)
-        return DecryptedDB(self.db)
+        predicate(DecryptedDB(self.db))
+        self.db.encrypt(master)
 
     def save(self, path: Optional[str] = None) -> None:
         self.db.save(path)
