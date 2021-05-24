@@ -18,5 +18,7 @@ setuptools.setup(
     ],
     packages=["pypassafe"],
     python_requires=">=3.8",
-    install_requires=[],
+    install_requires=[
+        "pycryptodome",
+    ],
 )
