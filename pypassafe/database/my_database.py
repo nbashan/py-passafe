@@ -4,11 +4,9 @@ import pickle
 
 from Crypto.Random import get_random_bytes
 from Crypto.Protocol.KDF import PBKDF2
-from Crypto.Hash import SHA256, MD5
+from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-
-MD5_SIZE = 16
 
 
 class MyDataBase(DataBase):
@@ -21,23 +19,13 @@ class MyDataBase(DataBase):
             with open(self.path, 'rb') as file:
                 self.data = file.read()
         except FileNotFoundError:
-            self.data = None
+            self.data = list()
 
     def decrypt(self, master: str) -> None:
-        # when creating a new database, data is equal to None
-        if self.data is None:
-            self.data = list()
-            return
-
         assert isinstance(self.data, bytes), "tries to decrypt when already decrypted"
 
         self.master = master
         offset = 0
-
-        file_hash = self.data[offset:offset + MD5_SIZE]
-        offset += MD5_SIZE
-        data_hash = MD5.new(self.data[offset:]).digest()
-        assert data_hash == file_hash, "file is corrupted"
 
         salt_size = int.from_bytes(self.data[offset:offset + self.SALT_BYTES], \
                                    byteorder='little', signed=False)
@@ -76,11 +64,7 @@ class MyDataBase(DataBase):
         cipher = AES.new(key, AES.MODE_CBC, iv)
 
         data_padded = pad(pickle.dumps(self.data), AES.block_size)
-
         self.data = salt_size_bytes + loops_bytes + salt + iv + cipher.encrypt(data_padded)
-
-        md5_hash = MD5.new(self.data).digest()
-        self.data = md5_hash + self.data
 
     def save(self, path: Optional[str] = None) -> None:
         assert isinstance(self.data, bytes), "tries to save decrypted data"
