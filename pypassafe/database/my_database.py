@@ -28,11 +28,11 @@ class MyDataBase(DataBase):
         offset = 0
 
         salt_size = int.from_bytes(self.data[offset:offset + self.SALT_BYTES], \
-                byteorder='little', signed=False)
+                                   byteorder='little', signed=False)
         offset += self.SALT_BYTES
 
         loops = int.from_bytes(self.data[offset:offset + self.LOOPS_BYTES], \
-                byteorder='little', signed=False)
+                               byteorder='little', signed=False)
         offset += self.LOOPS_BYTES
 
         salt = self.data[offset:offset + salt_size]
@@ -92,4 +92,3 @@ class MyDataBase(DataBase):
 
     def remove(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> None:
         self.data = [obj for obj in self.data if not predicate(obj)]
-
