@@ -1,7 +1,7 @@
 from .database import DataBase
 from pypassafe.migrations import MigrateableObject
 
-from typing import Optional, Callable, List
+from typing import Optional, Callable, Set
 import pickle
 
 from Crypto.Random import get_random_bytes
@@ -28,12 +28,11 @@ class MyDataBase(DataBase):
     def decrypt(self, master: str) -> None:
         # when creating a new database, data is equal to None
         if self.data is None:
-            self.data = list()
+            self.data = set()
             return
 
         assert isinstance(self.data, bytes), "tries to decrypt when already decrypted"
 
-        self.master = master
         offset = 0
 
         file_hash = self.data[offset:offset + MD5_SIZE]
@@ -62,11 +61,8 @@ class MyDataBase(DataBase):
 
         self.data = pickle.loads(decrypted)
 
-    def encrypt(self, master: Optional[str] = None, loops: int = 1000000, salt_size: int = 32) -> None:
-        assert isinstance(self.data, list), "tries to encrypt when already encrypted"
-
-        if master is None:
-            master = self.master
+    def encrypt(self, master: str, loops: int, salt_size: int) -> None:
+        assert isinstance(self.data, set), "tries to encrypt when already encrypted"
 
         salt_size_bytes = salt_size.to_bytes(length=self.SALT_BYTES, byteorder='little', signed=False)
         loops_bytes = loops.to_bytes(length=self.LOOPS_BYTES, byteorder='little', signed=False)
@@ -92,21 +88,21 @@ class MyDataBase(DataBase):
         with open(self.path, 'wb') as file:
             file.write(self.data)
 
-    def get(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> List[MigrateableObject]:
-        return list(filter(predicate, self.data))
+    def get(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> Set[MigrateableObject]:
+        return (obj for obj in self.data if predicate(obj))
 
     def add(self, obj: MigrateableObject) -> None:
-        self.data.append(obj)
+        self.data.add(obj)
 
     def update(self, predicate: Callable[[MigrateableObject], Optional[MigrateableObject]], count: Optional[int] = None) -> None:
-        ret = []
+        ret = set()
         for obj in self.data:
             x = predicate(obj)
             if x is None:
-                ret.append(obj)
+                ret.add(obj)
             else:
-                ret.append(x)
+                ret.add(x)
         self.data = ret
 
     def remove(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> None:
-        self.data = [obj for obj in self.data if not predicate(obj)]
+        self.data = (obj for obj in self.data if not predicate(obj))

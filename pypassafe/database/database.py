@@ -9,7 +9,7 @@ class DataBase:
     def decrypt(self, master: str) -> None:
         raise NotImplementedError()
 
-    def encrypt(self, master: Optional[str] = None) -> None:
+    def encrypt(self, master: str, loops: int, salt_size: int) -> None:
         raise NotImplementedError()
 
     def save(self, path: Optional[str] = None) -> None:
@@ -52,10 +52,10 @@ class EncryptedDB:
             return
         raise ValueError("EncryptedDB should get path and db type or existing DataBase")
 
-    def decrypt(self, master: str, predicate: Callable[[DecryptedDB], None]) -> None:
+    def decrypt(self, master: str, predicate: Callable[[DecryptedDB], None], loops: int = 1_000_000, salt_size: int = 32) -> None:
         self.db.decrypt(master)
         predicate(DecryptedDB(self.db))
-        self.db.encrypt(master)
+        self.db.encrypt(master, loops, salt_size)
 
     def save(self, path: Optional[str] = None) -> None:
         self.db.save(path)
