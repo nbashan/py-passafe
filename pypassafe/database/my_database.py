@@ -1,5 +1,7 @@
 from .database import DataBase
-from typing import Optional, Callable, Any, List
+from pypassafe.migrations import MigrateableObject
+
+from typing import Optional, Callable, List
 import pickle
 
 from Crypto.Random import get_random_bytes
@@ -90,13 +92,13 @@ class MyDataBase(DataBase):
         with open(self.path, 'wb') as file:
             file.write(self.data)
 
-    def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> List[Any]:
+    def get(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> List[MigrateableObject]:
         return list(filter(predicate, self.data))
 
-    def add(self, obj: Any) -> None:
+    def add(self, obj: MigrateableObject) -> None:
         self.data.append(obj)
 
-    def update(self, predicate: Callable[[Any], Optional[Any]], count: Optional[int] = None) -> None:
+    def update(self, predicate: Callable[[MigrateableObject], Optional[MigrateableObject]], count: Optional[int] = None) -> None:
         ret = []
         for obj in self.data:
             x = predicate(obj)
@@ -106,5 +108,5 @@ class MyDataBase(DataBase):
                 ret.append(x)
         self.data = ret
 
-    def remove(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> None:
+    def remove(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> None:
         self.data = [obj for obj in self.data if not predicate(obj)]

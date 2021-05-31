@@ -1,4 +1,5 @@
-from typing import Optional, Callable, Any, Type, List
+from typing import Optional, Callable, Type, List
+from pypassafe.migrations import MigrateableObject
 
 
 class DataBase:
@@ -14,16 +15,16 @@ class DataBase:
     def save(self, path: Optional[str] = None) -> None:
         raise NotImplementedError()
 
-    def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> List[Any]:
+    def get(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> List[MigrateableObject]:
         raise NotImplementedError()
 
-    def add(self, obj: Any) -> None:
+    def add(self, obj: MigrateableObject) -> None:
         raise NotImplementedError()
 
-    def update(self, predicate: Callable[[Any], Optional[Any]], count: Optional[int] = None) -> None:
+    def update(self, predicate: Callable[[MigrateableObject], Optional[MigrateableObject]], count: Optional[int] = None) -> None:
         raise NotImplementedError()
 
-    def remove(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> None:
+    def remove(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> None:
         raise NotImplementedError()
 
 
@@ -31,16 +32,16 @@ class DecryptedDB:
     def __init__(self, db: DataBase) -> None:
         self.db = db
 
-    def get(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> List[Any]:
+    def get(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> List[MigrateableObject]:
         return self.db.get(predicate, count)
 
-    def add(self, obj: Any) -> None:
+    def add(self, obj: MigrateableObject) -> None:
         self.db.add(obj)
 
-    def update(self, predicate: Callable[[Any], Optional[Any]], count: Optional[int] = None) -> None:
+    def update(self, predicate: Callable[[MigrateableObject], Optional[MigrateableObject]], count: Optional[int] = None) -> None:
         return self.db.update(predicate, count)
 
-    def remove(self, predicate: Callable[[Any], bool], count: Optional[int] = None) -> None:
+    def remove(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> None:
         self.db.remove(predicate, count)
 
 
