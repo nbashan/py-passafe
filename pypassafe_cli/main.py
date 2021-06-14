@@ -12,6 +12,9 @@ def context_parser(args):
 def get_master() -> str:
     return getpass(prompt="master password [hidden input]:")
 
+def login_to_str(login):
+    return f"name: {login.name}\nurl: {login.url}\npassword: {login.password}"
+
 @subcmd
 def get(parser: ArgumentParser, context, cargs):
     cmds = ["password", "name", "url", "login"]
@@ -41,7 +44,15 @@ def get(parser: ArgumentParser, context, cargs):
     if cargs[0] == "name":
         print(vault.get_name(password=parsed.password, url=parsed.url, count=parsed.count, master=get_master()))
     if cargs[0] == "login":
-        print(vault.get_login(password=parsed.password, url=parsed.url, name=parsed.name, count=parsed.count, master=get_master()))
+        print("*** found logins ***",
+                ('*' * 10 + '\n').join(map(login_to_str,
+                vault.get_login(
+                password=parsed.password,
+                url=parsed.url,
+                name=parsed.name,
+                count=parsed.count,
+                master=get_master()))),
+            sep='\n')
 
 @subcmd
 def add(parser: ArgumentParser, context, cargs):

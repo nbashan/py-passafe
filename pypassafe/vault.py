@@ -24,7 +24,22 @@ class Vault:
 
     def get_url(self): pass
     def get_name(self): pass
-    def get_login(self): pass
+    def get_login(self,
+            master: str,
+            password: Optional[str] = None,
+            name: Optional[str] = None,
+            url: Optional[str] = None,
+            count: Optional[int] = None) -> Set[Login]:
+
+        def get_correct_logins(obj):
+            return isinstance(obj, Login) and \
+                    (obj.password == password or password is None) and \
+                    (obj.url == url or url is None) and \
+                    (obj.name == name or name is None)
+        def get_login_from_db(db):
+            return db.get(get_correct_logins, count=count)
+
+        return self.db.decrypt(master=master, predicate=get_login_from_db)
 
     def add_login(self,
             password: str,
