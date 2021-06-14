@@ -114,6 +114,8 @@ class MyDataBase(DataBase):
                     new_data.add(x)
                     if count is not None:
                         count -= 1
+            else:
+                new_data.add(obj)
         self.data = new_data
 
     def remove(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> None:

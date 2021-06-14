@@ -88,7 +88,7 @@ def set(parser: ArgumentParser, context, cargs):
     parser.add_argument("--new-url", dest="new_url", metavar="URL", help="the login's url to set")
     parser.add_argument("--new-name", dest="new_name", metavar="NAME", help="the login's name to set")
 
-    parser.add_argument("-c", "--count", dest="count", metavar="COUNT", help="number of items to set", default=1)
+    parser.add_argument("-c", "--count", dest="count", metavar="COUNT", help="number of items to set")
 
     parsed = parser.parse_args(cargs[1:])
 
@@ -96,7 +96,7 @@ def set(parser: ArgumentParser, context, cargs):
     vault.set_login(
             password=parsed.password,
             url=parsed.url,
-            name=parsed.url,
+            name=parsed.name,
             new_password=parsed.new_password,
             new_url=parsed.new_url,
             new_name=parsed.new_name,

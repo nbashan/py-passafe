@@ -97,6 +97,7 @@ class Vault:
                    (obj.password == password or password is None) and \
                    (obj.url == url or url is None) and \
                    (obj.name == name or name is None):
+
                 if new_password is not None:
                     obj.password  = new_password
                 if new_name is not None:
@@ -108,6 +109,7 @@ class Vault:
             return None
 
         def update_login(db):
-            db.update(predicate=get_correct_logins,count=count)
+            db.update(predicate=get_correct_logins, count=count)
 
-        return self.db.decrypt(master=master,predicate=update_login)
+        self.db.decrypt(master=master,predicate=update_login)
+        self.db.save()
