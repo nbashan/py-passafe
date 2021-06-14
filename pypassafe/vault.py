@@ -90,19 +90,18 @@ class Vault:
                   new_password: Optional[str] = None,
                   new_url: Optional[str] = None,
                   new_name: Optional[str] = None,
-                  count: Optional[int] = None,
-                  ) -> None:
+                  count: Optional[int] = None) -> None:
 
         def get_correct_logins(obj):
             if isinstance(obj, Login) and \
                    (obj.password == password or password is None) and \
                    (obj.url == url or url is None) and \
                    (obj.name == name or name is None):
-                if new_password:
+                if new_password is not None:
                     obj.password  = new_password
-                if new_name:
+                if new_name is not None:
                     obj.name = new_name
-                if new_url:
+                if new_url is not None:
                     obj.url = url
 
                 return obj

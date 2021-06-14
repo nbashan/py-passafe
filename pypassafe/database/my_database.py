@@ -40,11 +40,11 @@ class MyDataBase(DataBase):
         data_hash = MD5.new(self.data[offset:]).digest()
         assert data_hash == file_hash, "file is corrupted"
 
-        salt_size = int.from_bytes(self.data[offset:offset + self.SALT_BYTES],
+        salt_size = int.from_bytes(self.data[offset:offset + self.SALT_BYTES], \
                                    byteorder='little', signed=False)
         offset += self.SALT_BYTES
 
-        loops = int.from_bytes(self.data[offset:offset + self.LOOPS_BYTES],
+        loops = int.from_bytes(self.data[offset:offset + self.LOOPS_BYTES], \
                                byteorder='little', signed=False)
         offset += self.LOOPS_BYTES
 
@@ -88,23 +88,41 @@ class MyDataBase(DataBase):
         with open(self.path, 'wb') as file:
             file.write(self.data)
 
-    def get(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> Set[
-        MigrateableObject]:
-        return (obj for obj in self.data if predicate(obj))
+    def get(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> Set[MigrateableObject]:
+        assert isinstance(self.data, set), "try to get while not decrypted"
+
+        result = set()
+        for obj in self.data:
+            if (count is None or len(result) < count) and predicate(obj):
+                result.add(obj)
+        return result
 
     def add(self, obj: MigrateableObject) -> None:
-        self.data.add(obj)
+        assert isinstance(self.data, set), "try to add while not decrypted"
+        self.data.add(obj.update_to_last())
 
-    def update(self, predicate: Callable[[MigrateableObject], Optional[MigrateableObject]],
-               count: Optional[int] = None) -> None:
-        ret = set()
+    def update(self, predicate: Callable[[MigrateableObject], Optional[MigrateableObject]], count: Optional[int] = None) -> None:
+        assert isinstance(self.data, set), "try to update while not decrypted"
+
+        new_data = set()
         for obj in self.data:
-            x = predicate(obj)
-            if x is None:
-                ret.add(obj)
-            else:
-                ret.add(x)
-        self.data = ret
+            if count is None or count > 0:
+                x = predicate(obj)
+                if x is None:
+                    new_data.add(obj)
+                else:
+                    new_data.add(x)
+                    if count is not None:
+                        count -= 1
+        self.data = new_data
 
     def remove(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> None:
-        self.data = (obj for obj in self.data if not predicate(obj))
+        assert isinstance(self.data, set), "try to remove while not decrypted"
+
+        new_data = set()
+        for obj in self.data:
+            if count is not None and count <= 0 or not predicate(obj):
+                new_data.add(obj)
+            elif count is not None:
+                count -= 1
+        self.data = new_data

@@ -45,7 +45,7 @@ def get(parser: ArgumentParser, context, cargs):
         print(vault.get_name(password=parsed.password, url=parsed.url, count=parsed.count, master=get_master()))
     if cargs[0] == "login":
         print("*** found logins ***",
-                ('*' * 10 + '\n').join(map(login_to_str,
+                ('\n' + '*' * 10 + '\n').join(map(login_to_str,
                 vault.get_login(
                 password=parsed.password,
                 url=parsed.url,
