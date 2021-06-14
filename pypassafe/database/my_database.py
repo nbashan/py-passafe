@@ -40,11 +40,11 @@ class MyDataBase(DataBase):
         data_hash = MD5.new(self.data[offset:]).digest()
         assert data_hash == file_hash, "file is corrupted"
 
-        salt_size = int.from_bytes(self.data[offset:offset + self.SALT_BYTES], \
+        salt_size = int.from_bytes(self.data[offset:offset + self.SALT_BYTES],
                                    byteorder='little', signed=False)
         offset += self.SALT_BYTES
 
-        loops = int.from_bytes(self.data[offset:offset + self.LOOPS_BYTES], \
+        loops = int.from_bytes(self.data[offset:offset + self.LOOPS_BYTES],
                                byteorder='little', signed=False)
         offset += self.LOOPS_BYTES
 
@@ -88,13 +88,15 @@ class MyDataBase(DataBase):
         with open(self.path, 'wb') as file:
             file.write(self.data)
 
-    def get(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> Set[MigrateableObject]:
+    def get(self, predicate: Callable[[MigrateableObject], bool], count: Optional[int] = None) -> Set[
+        MigrateableObject]:
         return (obj for obj in self.data if predicate(obj))
 
     def add(self, obj: MigrateableObject) -> None:
         self.data.add(obj)
 
-    def update(self, predicate: Callable[[MigrateableObject], Optional[MigrateableObject]], count: Optional[int] = None) -> None:
+    def update(self, predicate: Callable[[MigrateableObject], Optional[MigrateableObject]],
+               count: Optional[int] = None) -> None:
         ret = set()
         for obj in self.data:
             x = predicate(obj)
