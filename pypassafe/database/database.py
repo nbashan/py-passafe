@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Type, List
+from typing import Optional, Callable, Type, List, Any
 from pypassafe.migrations import MigrateableObject
 
 
@@ -52,10 +52,11 @@ class EncryptedDB:
             return
         raise ValueError("EncryptedDB should get path and db type or existing DataBase")
 
-    def decrypt(self, master: str, predicate: Callable[[DecryptedDB], None], loops: int = 1_000_000, salt_size: int = 32) -> None:
+    def decrypt(self, master: str, predicate: Callable[[DecryptedDB], Any], loops: int = 1_000_000, salt_size: int = 32) -> Any:
         self.db.decrypt(master)
-        predicate(DecryptedDB(self.db))
+        result = predicate(DecryptedDB(self.db))
         self.db.encrypt(master, loops, salt_size)
+        return result
 
     def save(self, path: Optional[str] = None) -> None:
         self.db.save(path)
