@@ -2,9 +2,11 @@ from pypassafe.login import manager
 from pypassafe.migrations import MigrateableObject
 from .login_1 import Login1
 
+from typing import Optional
+
 
 class Login2(MigrateableObject):
-    def __init__(self, name: str, password: str, url: str) -> None:
+    def __init__(self, password: str, name: Optional[str] = None, url: Optional[str] = None) -> None:
         self.name = name
         self.password = password
         self.url = url
