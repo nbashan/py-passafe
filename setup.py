@@ -16,12 +16,16 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent"
     ],
-    packages=setuptools.find_packages(include=["pypassafe", "pypassafe.*"]),
+    packages=setuptools.find_packages(include=["pypassafe", "pypassafe.*", "pypassafe_cli"]),
     python_requires=">=3.8",
     install_requires=[
         "pycryptodome",
+        "arghandler",
     ],
     test_suite="nose.collector",
     tests_require=["nose"],
     include_package_data=True,
+    entry_points={
+        "console_scripts": ["passafe=pypassafe_cli.main:main"]
+    }
 )
