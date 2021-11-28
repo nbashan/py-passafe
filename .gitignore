@@ -1,6 +1,10 @@
 # Remove .idea folder
 .idea
 
+# Remove pipenv files
+Pipfile
+Pipfile.lock
+
 # Compiled python modules
 *.pyc
 
